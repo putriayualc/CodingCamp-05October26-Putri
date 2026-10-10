@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       LocalStorage unavailability warning banner
+       Hidden by default; App.init() removes .hidden when storage is absent.
+       (Requirement 9.4)
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <div id="storage-warning" class="storage-warning hidden" role="alert" aria-live="polite">
+    <p>
+      <strong>Warning:</strong> Local Storage is unavailable in this browser.
+      Your data will not be saved between sessions.
+    </p>
+    <button
+      id="storage-warning-dismiss"
+      type="button"
+      class="storage-warning__dismiss"
+      aria-label="Dismiss storage warning"
+    >Dismiss</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       Page header — branding + theme toggle
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <h1 class="site-header__title">My Dashboard</h1>
+
+    <!-- Theme toggle (Requirement 8.1) -->
+    <button
+      id="theme-toggle"
+      type="button"
+      class="theme-toggle"
+      aria-label="Toggle dark mode"
+      aria-pressed="false"
+    >
+      <span class="theme-toggle__icon theme-toggle__icon--light" aria-hidden="true">☀️</span>
+      <span class="theme-toggle__icon theme-toggle__icon--dark"  aria-hidden="true">🌙</span>
+    </button>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       Main dashboard grid
+       Four widget quadrants arranged in a 2×2 CSS Grid.
+       (Requirement 10.2, 10.4)
+  ═══════════════════════════════════════════════════════════════════════ -->
+  <main class="dashboard-grid">
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         Widget 1 — Greeting
+         IDs required by GreetingWidget and NameController modules.
+    ───────────────────────────────────────────────────────────────────── -->
+    <section id="widget-greeting" class="widget widget--greeting" aria-label="Greeting and clock">
+
+      <!-- Clock & date (Requirements 1.1, 1.2) -->
+      <p id="time-display"    class="greeting__time"    aria-live="polite" aria-label="Current time">--:--</p>
+      <p id="date-display"    class="greeting__date"    aria-live="polite" aria-label="Current date">Date unavailable</p>
+      <p id="greeting-text"   class="greeting__message" aria-live="polite" aria-label="Greeting message"></p>
+
+      <!-- Custom name form (Requirements 2.1–2.6) -->
+      <div class="name-form">
+        <label for="name-input" class="name-form__label">Your name</label>
+        <div class="name-form__row">
+          <input
+            id="name-input"
+            type="text"
+            class="name-form__input"
+            placeholder="Enter your name…"
+            maxlength="50"
+            autocomplete="off"
+            aria-describedby="name-error name-confirm"
+            aria-label="Custom name for greeting"
+          />
+          <button
+            id="name-save"
+            type="button"
+            class="name-form__btn"
+            aria-label="Save name"
+          >Save</button>
+        </div>
+        <!-- Inline validation error -->
+        <span
+          id="name-error"
+          class="error-msg"
+          role="alert"
+          aria-live="polite"
+        ></span>
+        <!-- Save confirmation flash -->
+        <span
+          id="name-confirm"
+          class="confirmation"
+          aria-live="polite"
+        ></span>
+      </div>
+
+    </section><!-- /#widget-greeting -->
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         Widget 2 — Pomodoro Timer
+         IDs required by TimerModule.
+    ───────────────────────────────────────────────────────────────────── -->
+    <section id="widget-timer" class="widget widget--timer" aria-label="Pomodoro focus timer">
+
+      <h2 class="widget__title">Focus Timer</h2>
+
+      <!-- Countdown display (Requirement 3.1) -->
+      <p
+        id="timer-display"
+        class="timer__display"
+        aria-live="off"
+        aria-label="Timer countdown"
+        role="timer"
+      >25:00</p>
+
+      <!-- Control buttons -->
+      <div class="timer__controls" role="group" aria-label="Timer controls">
+        <button
+          id="timer-start"
+          type="button"
+          class="timer__btn timer__btn--start"
+          aria-label="Start timer"
+        >Start</button>
+
+        <button
+          id="timer-stop"
+          type="button"
+          class="timer__btn timer__btn--stop"
+          disabled
+          aria-label="Stop timer"
+        >Stop</button>
+
+        <button
+          id="timer-reset"
+          type="button"
+          class="timer__btn timer__btn--reset"
+          aria-label="Reset timer"
+        >Reset</button>
+      </div>
+
+      <!-- Duration input (Requirements 4.1–4.6) -->
+      <div class="timer__duration-row">
+        <label for="timer-duration" class="timer__duration-label">
+          Duration (minutes)
+        </label>
+        <input
+          id="timer-duration"
+          type="number"
+          class="timer__duration-input"
+          value="25"
+          min="1"
+          max="120"
+          step="1"
+          aria-describedby="timer-error"
+          aria-label="Timer duration in minutes"
+        />
+      </div>
+
+      <!-- Inline validation error for duration -->
+      <span
+        id="timer-error"
+        class="error-msg hidden"
+        role="alert"
+        aria-live="polite"
+      ></span>
+
+    </section><!-- /#widget-timer -->
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         Widget 3 — To-Do List
+         IDs required by TodoModule.
+    ───────────────────────────────────────────────────────────────────── -->
+    <section id="widget-todo" class="widget widget--todo" aria-label="To-do list">
+
+      <h2 class="widget__title">Tasks</h2>
+
+      <!-- Add-task form (Requirements 5.3, 5.8, 5.9) -->
+      <form id="todo-form" class="todo__add-form" novalidate>
+        <label for="todo-input" class="sr-only">New task</label>
+        <input
+          id="todo-input"
+          type="text"
+          class="todo__add-input"
+          placeholder="Add a new task…"
+          maxlength="100"
+          autocomplete="off"
+          aria-describedby="todo-error"
+          aria-label="New task text"
+        />
+        <button
+          type="submit"
+          class="todo__add-btn"
+          aria-label="Add task"
+        >Add</button>
+      </form>
+
+      <!-- Inline validation error for add-task -->
+      <span
+        id="todo-error"
+        class="error-msg hidden"
+        role="alert"
+        aria-live="polite"
+      ></span>
+
+      <!-- Sort control (Requirement 6.1) -->
+      <div class="todo__sort-row">
+        <label for="todo-sort" class="todo__sort-label">Sort by</label>
+        <select
+          id="todo-sort"
+          class="todo__sort-select"
+          aria-label="Sort tasks"
+        >
+          <option value="default">Default (oldest first)</option>
+          <option value="completed-last">Completed last</option>
+          <option value="alpha">Alphabetical</option>
+        </select>
+      </div>
+
+      <!-- Empty-state message (Requirement 5.2) -->
+      <p
+        id="todo-empty"
+        class="todo__empty hidden"
+        aria-live="polite"
+      >No tasks yet. Add one above!</p>
+
+      <!-- Task list (Requirements 5.1, 5.4, 5.5, 5.6) -->
+      <ul
+        id="todo-list"
+        class="todo__list"
+        aria-label="Task list"
+        aria-live="polite"
+      ></ul>
+
+    </section><!-- /#widget-todo -->
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         Widget 4 — Quick Links
+         IDs required by QuickLinksModule.
+    ───────────────────────────────────────────────────────────────────── -->
+    <section id="widget-links" class="widget widget--links" aria-label="Quick links">
+
+      <h2 class="widget__title">Quick Links</h2>
+
+      <!-- Saved links grid (Requirements 7.1, 7.3, 7.4) -->
+      <div
+        id="links-list"
+        class="links__grid"
+        aria-label="Saved links"
+        aria-live="polite"
+      ></div>
+
+      <!-- Add-link form (Requirements 7.2, 7.6, 7.7, 7.8) -->
+      <form id="link-add-form" class="links__add-form" novalidate>
+
+        <div class="links__field-group">
+          <label for="link-name-input" class="links__label">Name</label>
+          <input
+            id="link-name-input"
+            type="text"
+            class="links__input"
+            placeholder="e.g. GitHub"
+            maxlength="50"
+            autocomplete="off"
+            aria-describedby="link-name-error"
+            aria-label="Link display name"
+          />
+          <!-- Inline error for name -->
+          <span
+            id="link-name-error"
+            class="error-msg hidden"
+            role="alert"
+            aria-live="polite"
+          ></span>
+        </div>
+
+        <div class="links__field-group">
+          <label for="link-url-input" class="links__label">URL</label>
+          <input
+            id="link-url-input"
+            type="url"
+            class="links__input"
+            placeholder="https://example.com"
+            maxlength="2048"
+            autocomplete="off"
+            aria-describedby="link-url-error"
+            aria-label="Link URL (must start with http:// or https://)"
+          />
+          <!-- Inline error for URL -->
+          <span
+            id="link-url-error"
+            class="error-msg hidden"
+            role="alert"
+            aria-live="polite"
+          ></span>
+        </div>
+
+        <button
+          type="submit"
+          class="links__add-btn"
+          aria-label="Add link"
+        >Add Link</button>
+
+      </form>
+
+    </section><!-- /#widget-links -->
+
+  </main><!-- /.dashboard-grid -->
+
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "personal-dashboard",
+  "version": "1.0.0",
+  "description": "Standalone personal productivity dashboard (HTML/CSS/Vanilla JS)",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8",
+    "fast-check": "^3.23.2"
+  }
+}
